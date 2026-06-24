@@ -1,0 +1,13 @@
+{
+  "framework": null,
+  "functions": {
+    "api/cron_relatorio.py": { "maxDuration": 30 },
+    "api/cron_monitor.py":   { "maxDuration": 20 },
+    "api/cron_eventos.py":   { "maxDuration": 15 }
+  },
+  "crons": [
+    { "path": "/api/cron_relatorio", "schedule": "0 11 * * *" },
+    { "path": "/api/cron_monitor",   "schedule": "0 12-22 * * 1-5" },
+    { "path": "/api/cron_eventos",   "schedule": "30 12-22 * * 1-5" }
+  ]
+}
