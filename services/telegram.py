@@ -3,7 +3,6 @@ import os
 import requests
 from datetime import datetime
 from fpdf import FPDF
-from fpdf.enums import XPos, YPos
 from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 
 BASE = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
@@ -60,13 +59,16 @@ def _gerar_pdf(texto: str) -> bytes:
             pdf.ln(3)
         elif l.startswith("MACRO ENGINE"):
             pdf.set_font("Helvetica", style="B", size=12)
-            pdf.multi_cell(0, 7, l, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.multi_cell(190, 7, l)
+            pdf.set_x(pdf.l_margin)
         elif l.startswith("-" * 10):
             pdf.set_font("Helvetica", size=8)
-            pdf.multi_cell(0, 4, l, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.multi_cell(190, 4, l)
+            pdf.set_x(pdf.l_margin)
         else:
             pdf.set_font("Helvetica", size=10)
-            pdf.multi_cell(0, 5, l, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.multi_cell(190, 5, l)
+            pdf.set_x(pdf.l_margin)
 
     return bytes(pdf.output())
 
