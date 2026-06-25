@@ -58,17 +58,40 @@ def _para_latin1(texto: str) -> str:
     return texto.encode("latin-1", errors="ignore").decode("latin-1")
 
 
+def _md_para_html(texto: str) -> str:
+    import html as _html
+    linhas = []
+    for linha in texto.split("\n"):
+        l = _html.escape(linha)                                   # escapa < > &
+        l = re.sub(r"^#{1,3}\s+(.+)$", r"<b>\1</b>", l)         # # Header → bold
+        l = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", l)           # **bold**
+        l = re.sub(r"\*(.+?)\*",     r"<i>\1</i>", l)            # *italic*
+        l = re.sub(r"_(.+?)_",       r"<i>\1</i>", l)            # _italic_
+        l = re.sub(r"`(.+?)`",       r"<code>\1</code>", l)      # `code`
+        if re.match(r"^[-=]{3,}$", l.strip()):                   # --- separador
+            l = ""
+        linhas.append(l)
+    return "\n".join(linhas)
+
+
 def enviar(texto: str) -> bool:
     MAX = 4096
-    partes = [texto[i:i+MAX] for i in range(0, len(texto), MAX)]
+    html = _md_para_html(texto)
+    partes = [html[i:i+MAX] for i in range(0, len(html), MAX)]
     ok = True
     for parte in partes:
         r = requests.post(
             f"{BASE}/sendMessage",
-            json={"chat_id": TELEGRAM_CHAT_ID, "text": parte},
+            json={"chat_id": TELEGRAM_CHAT_ID, "text": parte, "parse_mode": "HTML"},
             timeout=10,
         )
         if not r.ok:
+            # fallback sem formatação se HTML falhar
+            requests.post(
+                f"{BASE}/sendMessage",
+                json={"chat_id": TELEGRAM_CHAT_ID, "text": texto[:MAX]},
+                timeout=10,
+            )
             ok = False
     return ok
 
