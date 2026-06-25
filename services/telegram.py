@@ -1,13 +1,12 @@
 import io
 import os
+import re
 import requests
 from datetime import datetime
 from fpdf import FPDF
 from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 
 BASE = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
-
-FONT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "fonts", "DejaVuSans.ttf")
 
 EMOJI_MAP = {
     "🟢": "[RISK-ON]",   "🔴": "[RISK-OFF]",  "🟡": "[TRANSICAO]",
@@ -18,12 +17,22 @@ EMOJI_MAP = {
     "🥇": "1.",           "🥈": "2.",           "🥉": "3.",
     "4️⃣": "4.",          "5️⃣": "5.",          "✅": "[OK]",
     "❌": "[X]",          "🔺": "[ALTA]",       "🔻": "[QUEDA]",
+    "⭐": "*",            "—": "-",             "–": "-",
+    "—": "-",        "’": "'",        "“": '"',
+    "”": '"',
 }
 
 
-def _limpar(texto: str) -> str:
-    for emoji, sub in EMOJI_MAP.items():
-        texto = texto.replace(emoji, sub)
+def _limpar_para_pdf(texto: str) -> str:
+    for ch, sub in EMOJI_MAP.items():
+        texto = texto.replace(ch, sub)
+    # remove linhas de separador ━ e substitui por marcador interno
+    texto = re.sub(r'[━─═]+', "---SEP---", texto)
+    # strip markdown: **bold**, *italic*, _italic_, `code`, ```block```
+    texto = re.sub(r"\*{1,3}(.*?)\*{1,3}", r"\1", texto, flags=re.DOTALL)
+    texto = re.sub(r"_{1,3}(.*?)_{1,3}", r"\1", texto, flags=re.DOTALL)
+    texto = re.sub(r"`{1,3}.*?`{1,3}", "", texto, flags=re.DOTALL)
+    texto = re.sub(r"^#{1,6}\s+", "", texto, flags=re.MULTILINE)
     return texto
 
 
@@ -51,19 +60,21 @@ def _gerar_pdf(texto: str) -> bytes:
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
 
-    limpo = _limpar(texto).replace("━", "-" * 40)
+    limpo = _limpar_para_pdf(texto)
 
     for linha in limpo.split("\n"):
-        l = _para_latin1(linha)
-        if l.strip() == "":
+        l = _para_latin1(linha.rstrip())
+        if l.strip() == "---SEP---":
+            pdf.ln(2)
+            pdf.set_draw_color(150, 150, 150)
+            pdf.line(pdf.l_margin, pdf.get_y(), pdf.l_margin + 170, pdf.get_y())
             pdf.ln(3)
-        elif l.startswith("MACRO ENGINE"):
-            pdf.set_font("Helvetica", style="B", size=12)
-            pdf.multi_cell(190, 7, l)
             pdf.set_x(pdf.l_margin)
-        elif l.startswith("-" * 10):
-            pdf.set_font("Helvetica", size=8)
-            pdf.multi_cell(190, 4, l)
+        elif l.strip() == "":
+            pdf.ln(2)
+        elif l.startswith("MACRO ENGINE"):
+            pdf.set_font("Helvetica", style="B", size=13)
+            pdf.multi_cell(190, 7, l)
             pdf.set_x(pdf.l_margin)
         else:
             pdf.set_font("Helvetica", size=10)

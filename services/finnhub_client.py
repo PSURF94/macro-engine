@@ -105,6 +105,8 @@ def calendario_hoje() -> list[dict]:
             params={"from": hoje, "to": hoje},
             timeout=10,
         )
+        if r.status_code in (403, 401):
+            return []
         r.raise_for_status()
         eventos = r.json().get("economicCalendar", [])
 
