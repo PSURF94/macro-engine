@@ -2,19 +2,18 @@ import requests
 import time
 from datetime import date, datetime, timezone, timedelta
 from config import FINNHUB_API_KEY
+from services.yahoo_client import coletar_precos_yahoo
 
 BASE    = "https://finnhub.io/api/v1"
 HEADERS = {"X-Finnhub-Token": FINNHUB_API_KEY}
 
-# Símbolos Finnhub — free tier, sem delay
+# Finnhub free tier: stocks e crypto — forex OANDA bloqueado (403)
 SIMBOLOS_QUOTE = {
     "sp500":  "SPY",              # ETF S&P 500 — regime filter
     "nasdaq": "QQQ",              # ETF Nasdaq — operável
     "dxy":    "UUP",              # ETF proxy DXY — regime filter
     "vix":    "VIXY",             # ETF proxy VIX — regime filter
-    "ouro":   "OANDA:XAU_USD",   # Ouro spot — operável
     "btc":    "BINANCE:BTCUSDT", # BTC via Binance — operável
-    "eurusd": "OANDA:EUR_USD",   # EUR/USD spot — operável
 }
 
 ENDPOINTS_CANDLE = {
@@ -22,9 +21,7 @@ ENDPOINTS_CANDLE = {
     "nasdaq": ("stock",  "QQQ"),
     "dxy":    ("stock",  "UUP"),
     "vix":    ("stock",  "VIXY"),
-    "ouro":   ("forex",  "OANDA:XAU_USD"),
     "btc":    ("crypto", "BINANCE:BTCUSDT"),
-    "eurusd": ("forex",  "OANDA:EUR_USD"),
 }
 
 
@@ -66,6 +63,7 @@ def _candle_1h(tipo: str, symbol: str) -> tuple[float | None, float | None]:
 def coletar_precos() -> dict:
     resultado = {}
 
+    # Finnhub: stocks + crypto
     for nome, symbol in SIMBOLOS_QUOTE.items():
         q = _quote(symbol)
         if not q:
@@ -89,6 +87,9 @@ def coletar_precos() -> dict:
             "min_dia":     round(q.get("l", 0), 4),
             "var_1h_pct":  var_1h,
         }
+
+    # Yahoo Finance: ouro (GC=F) e eurusd (EURUSD=X) — Finnhub bloqueia forex no free tier
+    resultado.update(coletar_precos_yahoo())
 
     return resultado
 
