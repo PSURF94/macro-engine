@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from services.finnhub_client import coletar_precos, calendario_hoje
 from services.rss_client import headlines_recentes
-from services.gemini_client import gerar_analise
+from services.llm_client import gerar_analise
 from services.telegram import enviar
 from modules.eventos import detectar_eventos
 

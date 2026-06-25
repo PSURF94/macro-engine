@@ -8,7 +8,7 @@ from services.finnhub_client import coletar_precos
 from services.fred_client import coletar_macro
 from services.coingecko_client import coletar_cripto
 from services.rss_client import headlines_recentes
-from services.gemini_client import gerar_analise
+from services.llm_client import gerar_analise
 from services.telegram import enviar
 from modules.regime import calcular_score_liquidez, classificar_regime
 from modules.eventos import detectar_eventos
