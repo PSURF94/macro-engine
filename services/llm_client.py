@@ -14,7 +14,7 @@ def gerar_analise(system_prompt: str, dados: dict) -> str:
             },
         ],
         "temperature": 0.3,
-        "max_tokens": 2048,
+        "max_completion_tokens": 2048,
     }
 
     with httpx.Client(timeout=30) as client:
