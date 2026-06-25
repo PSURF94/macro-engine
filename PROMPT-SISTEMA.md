@@ -276,7 +276,12 @@ ANALISE POR ATIVO
 
 ---
 RANKING DO DIA
-[ranking 1 a 4]
+[ranking 1 a 4 com flag VALE OLHAR nos ativos com nota >= 6.5]
+
+---
+VALE OLHAR HOJE
+[lista apenas os ativos com vale_olhar=true — 1 linha de contexto por ativo]
+[se nenhum: "Nenhum ativo com contexto favoravel — aguardar"]
 
 ---
 DIVERGENCIA EUR/OURO: [correlacionados / divergindo — leitura]
@@ -306,4 +311,6 @@ Classificacao: [verde/amarelo/vermelho]
 Intraday: [impacto]
 Swing: [impacto]
 Macro: [impacto]
-Acao imediata: [recomendação]
+
+VALE OLHAR: [lista os ativos com vale_olhar=true do ranking, com 1 linha de justificativa cada]
+Se nenhum: "nenhum — aguardar melhor contexto"

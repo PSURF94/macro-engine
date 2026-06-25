@@ -2,6 +2,7 @@
 # Ativos de regime (filtro apenas): S&P 500, DXY, VIX
 
 ATIVOS_OPERAVEIS = ("nasdaq", "ouro", "eurusd", "btc")
+LIMIAR_VALE_OLHAR = 6.5  # nota mínima para contexto favorável a operar
 
 NOMES_PT = {
     "nasdaq": "Nasdaq (NQ)",
@@ -76,10 +77,19 @@ def gerar_ranking(regime: str, precos: dict, cripto: dict) -> list[dict]:
     }
     ordenado = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     return [
-        {"medalha": MEDALHAS[i], "ativo": NOMES_PT[nome], "nota": nota}
+        {
+            "medalha":    MEDALHAS[i],
+            "ativo":      NOMES_PT[nome],
+            "nota":       nota,
+            "vale_olhar": nota >= LIMIAR_VALE_OLHAR,
+        }
         for i, (nome, nota) in enumerate(ordenado)
     ]
 
 
 def formatar_ranking(ranking: list[dict]) -> str:
-    return "\n".join(f"{r['medalha']} {r['ativo']} — {r['nota']}/10" for r in ranking)
+    linhas = []
+    for r in ranking:
+        flag = " [VALE OLHAR]" if r.get("vale_olhar") else ""
+        linhas.append(f"{r['medalha']} {r['ativo']} — {r['nota']}/10{flag}")
+    return "\n".join(linhas)
