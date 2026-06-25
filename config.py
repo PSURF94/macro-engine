@@ -11,17 +11,26 @@ CEREBRAS_API_KEY   = os.environ["CEREBRAS_API_KEY"]
 CEREBRAS_MODEL     = "gpt-oss-120b"
 
 RSS_FEEDS = [
-    "https://www.forexlive.com/feed/news",                       # macro, forex — mais rápido
-    "https://www.forexlive.com/feed/centralbank",                # Fed, ECB, BOJ
-    "https://www.cnbc.com/id/10000664/device/rss/rss.html",     # mercados EUA
+    "https://www.forexlive.com/feed/news",                       # breaking news macro/forex — mais rápido
+    "https://www.forexlive.com/feed/centralbank",                # Fed, ECB, BOJ — decisões e falas
+    "https://www.rttnews.com/RSS/EconomicNews.xml",              # dados econômicos publicados — RTTNews
+    "https://www.cnbc.com/id/10000664/device/rss/rss.html",     # mercados EUA — CNBC
 ]
 
 RSS_KEYWORDS = {
-    "fed", "fomc", "rate cut", "rate hike", "cpi", "inflation",
-    "payroll", "gdp", "recession", "default", "bank", "war",
-    "sanction", "liquidity", "treasury", "yield", "powell",
-    "ecb", "lagarde", "dollar", "euro", "dxy", "risk-off", "risk-on",
-    "tariff", "jobs", "unemployment", "pce", "debt", "deficit",
+    # política monetária
+    "fed", "fomc", "rate cut", "rate hike", "powell", "ecb", "lagarde",
+    "boj", "rba", "boe", "central bank", "interest rate", "monetary",
+    # macro dados
+    "cpi", "pce", "inflation", "payroll", "nonfarm", "gdp", "unemployment",
+    "jobless", "claims", "retail", "manufacturing", "pmi", "ifo", "confidence",
+    # mercados e liquidez
+    "treasury", "yield", "spread", "liquidity", "m2", "balance sheet",
+    "recession", "default", "debt", "deficit",
+    # câmbio e risco
+    "dollar", "euro", "dxy", "risk-off", "risk-on",
+    # geopolítica
+    "war", "sanction", "tariff", "trade",
 }
 
 FRED_SERIES = {
