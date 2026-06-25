@@ -24,7 +24,7 @@ EMOJI_MAP = {
 def _limpar(texto: str) -> str:
     for emoji, sub in EMOJI_MAP.items():
         texto = texto.replace(emoji, sub)
-    return "".join(c if ord(c) < 0x3000 else "?" for c in texto)
+    return texto
 
 
 def enviar(texto: str) -> bool:
@@ -43,7 +43,7 @@ def enviar(texto: str) -> bool:
 
 
 def _para_latin1(texto: str) -> str:
-    return texto.encode("latin-1", errors="replace").decode("latin-1")
+    return texto.encode("latin-1", errors="ignore").decode("latin-1")
 
 
 def _gerar_pdf(texto: str) -> bytes:
