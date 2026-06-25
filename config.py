@@ -8,7 +8,7 @@ TELEGRAM_CHAT_ID   = os.environ["TELEGRAM_CHAT_ID"]    # mesmo chat_id do Hermes
 FRED_API_KEY       = os.environ["FRED_API_KEY"]
 FINNHUB_API_KEY    = os.environ["FINNHUB_API_KEY"]
 GEMINI_API_KEY     = os.environ["GEMINI_API_KEY"]
-GEMINI_MODEL       = "gemini-3.5-flash"
+GEMINI_MODEL       = "gemini-2.5-flash"
 
 RSS_FEEDS = [
     "https://feeds.reuters.com/reuters/businessNews",
