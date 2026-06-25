@@ -8,12 +8,13 @@ HEADERS = {"X-Finnhub-Token": FINNHUB_API_KEY}
 
 # Símbolos Finnhub — free tier, sem delay
 SIMBOLOS_QUOTE = {
-    "sp500":  "SPY",              # ETF S&P 500 — real-time
-    "nasdaq": "QQQ",              # ETF Nasdaq — real-time
-    "dxy":    "UUP",              # ETF proxy DXY (Invesco DB USD Bullish)
-    "vix":    "VIXY",             # ETF proxy VIX (ProShares VIX Short-Term)
-    "ouro":   "OANDA:XAU_USD",   # Ouro spot via Finnhub Forex
-    "btc":    "BINANCE:BTCUSDT", # BTC via Binance
+    "sp500":  "SPY",              # ETF S&P 500 — regime filter
+    "nasdaq": "QQQ",              # ETF Nasdaq — operável
+    "dxy":    "UUP",              # ETF proxy DXY — regime filter
+    "vix":    "VIXY",             # ETF proxy VIX — regime filter
+    "ouro":   "OANDA:XAU_USD",   # Ouro spot — operável
+    "btc":    "BINANCE:BTCUSDT", # BTC via Binance — operável
+    "eurusd": "OANDA:EUR_USD",   # EUR/USD spot — operável
 }
 
 ENDPOINTS_CANDLE = {
@@ -23,6 +24,7 @@ ENDPOINTS_CANDLE = {
     "vix":    ("stock",  "VIXY"),
     "ouro":   ("forex",  "OANDA:XAU_USD"),
     "btc":    ("crypto", "BINANCE:BTCUSDT"),
+    "eurusd": ("forex",  "OANDA:EUR_USD"),
 }
 
 
