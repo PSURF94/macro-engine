@@ -42,21 +42,30 @@ def enviar(texto: str) -> bool:
     return ok
 
 
+def _para_latin1(texto: str) -> str:
+    return texto.encode("latin-1", errors="replace").decode("latin-1")
+
+
 def _gerar_pdf(texto: str) -> bytes:
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
-    pdf.add_font("DejaVu", "", FONT_PATH)
-    pdf.set_font("DejaVu", size=10)
 
-    limpo = _limpar(texto)
-    limpo = limpo.replace("━", "-")
+    limpo = _limpar(texto).replace("━", "-" * 40)
 
     for linha in limpo.split("\n"):
-        if linha.strip() == "":
+        l = _para_latin1(linha)
+        if l.strip() == "":
             pdf.ln(3)
+        elif l.startswith("MACRO ENGINE"):
+            pdf.set_font("Helvetica", style="B", size=12)
+            pdf.multi_cell(0, 7, l)
+        elif l.startswith("-" * 10):
+            pdf.set_font("Helvetica", size=8)
+            pdf.multi_cell(0, 4, l)
         else:
-            pdf.multi_cell(0, 5, linha)
+            pdf.set_font("Helvetica", size=10)
+            pdf.multi_cell(0, 5, l)
 
     return bytes(pdf.output())
 
