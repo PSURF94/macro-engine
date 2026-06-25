@@ -47,21 +47,15 @@ def _gerar_pdf(texto: str) -> bytes:
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
     pdf.add_font("DejaVu", "", FONT_PATH)
+    pdf.set_font("DejaVu", size=10)
 
-    for linha in _limpar(texto).split("\n"):
-        if linha.startswith("MACRO ENGINE"):
-            pdf.set_font("DejaVu", size=13)
-            pdf.multi_cell(0, 7, linha)
-            pdf.set_font("DejaVu", size=10)
-        elif linha.startswith("━"):
-            pdf.ln(2)
-            pdf.set_draw_color(150, 150, 150)
-            pdf.line(pdf.get_x(), pdf.get_y(), pdf.get_x() + 190, pdf.get_y())
-            pdf.ln(3)
-        elif linha.strip() == "":
+    limpo = _limpar(texto)
+    limpo = limpo.replace("━", "-")
+
+    for linha in limpo.split("\n"):
+        if linha.strip() == "":
             pdf.ln(3)
         else:
-            pdf.set_font("DejaVu", size=10)
             pdf.multi_cell(0, 5, linha)
 
     return bytes(pdf.output())
