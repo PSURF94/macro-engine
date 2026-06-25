@@ -280,7 +280,8 @@ RANKING DO DIA
 
 ---
 VALE OLHAR HOJE
-[lista apenas os ativos com vale_olhar=true — 1 linha de contexto por ativo]
+[lista apenas os ativos com vale_olhar=true, com direcao e 1 linha de contexto]
+Formato: ATIVO — LONG/SHORT — [motivo em 1 linha]
 [se nenhum: "Nenhum ativo com contexto favoravel — aguardar"]
 
 ---
@@ -312,5 +313,6 @@ Intraday: [impacto]
 Swing: [impacto]
 Macro: [impacto]
 
-VALE OLHAR: [lista os ativos com vale_olhar=true do ranking, com 1 linha de justificativa cada]
+VALE OLHAR: [lista os ativos com vale_olhar=true, com direcao e 1 linha de justificativa]
+Formato: ATIVO — LONG/SHORT — [motivo]
 Se nenhum: "nenhum — aguardar melhor contexto"

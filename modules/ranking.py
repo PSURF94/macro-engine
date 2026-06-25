@@ -70,17 +70,26 @@ def pontuar_ativo(nome: str, regime: str, preco_data: dict, cripto_data: dict = 
     return round(min(nota, 10.0), 1)
 
 
+DIRECAO = {
+    "Risk-On":    {"nasdaq": "LONG", "ouro": "LONG", "eurusd": "LONG",  "btc": "LONG"},
+    "Risk-Off":   {"nasdaq": "SHORT","ouro": "LONG", "eurusd": "SHORT", "btc": "SHORT"},
+    "Transicao":  {"nasdaq": "—",    "ouro": "—",    "eurusd": "—",     "btc": "—"},
+}
+
+
 def gerar_ranking(regime: str, precos: dict, cripto: dict) -> list[dict]:
     scores = {
         nome: pontuar_ativo(nome, regime, precos.get(nome, {}), cripto)
         for nome in ATIVOS_OPERAVEIS
     }
     ordenado = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    direcoes = DIRECAO.get(regime, DIRECAO["Transicao"])
     return [
         {
             "medalha":    MEDALHAS[i],
             "ativo":      NOMES_PT[nome],
             "nota":       nota,
+            "direcao":    direcoes.get(nome, "—"),
             "vale_olhar": nota >= LIMIAR_VALE_OLHAR,
         }
         for i, (nome, nota) in enumerate(ordenado)
@@ -90,6 +99,7 @@ def gerar_ranking(regime: str, precos: dict, cripto: dict) -> list[dict]:
 def formatar_ranking(ranking: list[dict]) -> str:
     linhas = []
     for r in ranking:
-        flag = " [VALE OLHAR]" if r.get("vale_olhar") else ""
+        direcao = r.get("direcao", "—")
+        flag = f" [VALE OLHAR — {direcao}]" if r.get("vale_olhar") else f" [{direcao}]"
         linhas.append(f"{r['medalha']} {r['ativo']} — {r['nota']}/10{flag}")
     return "\n".join(linhas)
