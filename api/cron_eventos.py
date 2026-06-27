@@ -13,6 +13,9 @@ from services.telegram import enviar
 from modules.eventos import detectar_eventos
 from modules.regime import calcular_score_liquidez, classificar_regime
 from modules.ranking import gerar_ranking
+from datetime import datetime, timezone, timedelta
+
+BRT = timezone(timedelta(hours=-3))
 
 with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "PROMPT-SISTEMA.md")) as f:
     SYSTEM_PROMPT = f.read()
@@ -21,6 +24,12 @@ with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "PROMPT-SISTE
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
+            if datetime.now(tz=BRT).weekday() >= 5:
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"WEEKEND_SKIP")
+                return
+
             precos  = coletar_precos()
             eventos = detectar_eventos(precos)
 
