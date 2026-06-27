@@ -12,12 +12,21 @@ from services.llm_client import gerar_analise
 from services.telegram import enviar
 from modules.regime import calcular_score_liquidez, classificar_regime
 from modules.eventos import detectar_eventos
+from datetime import datetime, timezone, timedelta
+
+BRT = timezone(timedelta(hours=-3))
 
 with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "PROMPT-SISTEMA.md")) as f:
     SYSTEM_PROMPT = f.read()
 
 
 def gerar_monitor() -> str | None:
+    agora = datetime.now(tz=BRT)
+    if agora.weekday() >= 5:  # 5=sábado, 6=domingo
+        return None
+
+    hora_atual = agora.strftime("%H:%M")
+
     precos = coletar_precos()
     macro  = coletar_macro()
     cripto = coletar_cripto()
@@ -37,13 +46,14 @@ def gerar_monitor() -> str | None:
         return None
 
     dados = {
+        "hora_atual": hora_atual,
         "regime": regime_data,
         "precos": precos,
         "macro": macro,
         "cripto": cripto,
         "eventos_detectados": eventos,
         "headlines": news[:5],
-        "instrucao": "Gere o MONITOR HORÁRIO no formato compacto do PROMPT-SISTEMA.",
+        "instrucao": f"Gere o MONITOR HORÁRIO no formato compacto do PROMPT-SISTEMA. O horário atual em BRT é {hora_atual} — use exatamente esse valor em 'MONITOR [HH:MM]'.",
     }
 
     return gerar_analise(SYSTEM_PROMPT, dados)

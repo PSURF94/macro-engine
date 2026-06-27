@@ -10,16 +10,24 @@ from services.fred_client import coletar_macro
 from services.coingecko_client import coletar_cripto
 from services.rss_client import headlines_recentes
 from services.llm_client import gerar_analise
-from datetime import date
+from datetime import datetime, timezone, timedelta
 from services.telegram import enviar_pdf
 from modules.regime import calcular_score_liquidez, classificar_regime, calcular_prob_mudanca
 from modules.ranking import gerar_ranking, formatar_ranking
+
+BRT = timezone(timedelta(hours=-3))
 
 with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "PROMPT-SISTEMA.md")) as f:
     SYSTEM_PROMPT = f.read()
 
 
-def gerar_relatorio() -> str:
+def gerar_relatorio() -> str | None:
+    agora = datetime.now(tz=BRT)
+    if agora.weekday() >= 5:  # 5=sábado, 6=domingo
+        return None
+
+    data_hoje = agora.strftime("%d/%m/%Y")
+
     precos  = coletar_precos()
     macro   = coletar_macro()
     cripto  = coletar_cripto()
@@ -37,6 +45,7 @@ def gerar_relatorio() -> str:
     ranking = gerar_ranking(regime_data["regime"], precos, cripto)
 
     dados = {
+        "data_hoje": data_hoje,
         "regime": regime_data,
         "probabilidade_mudanca_5d": prob,
         "score_liquidez": score_liq,
@@ -46,7 +55,7 @@ def gerar_relatorio() -> str:
         "calendario": cal,
         "headlines": news[:10],
         "ranking": ranking,
-        "instrucao": "Gere o RELATÓRIO DIÁRIO completo seguindo exatamente o formato do PROMPT-SISTEMA.",
+        "instrucao": f"Gere o RELATÓRIO DIÁRIO completo seguindo exatamente o formato do PROMPT-SISTEMA. A data de hoje é {data_hoje}.",
     }
 
     return gerar_analise(SYSTEM_PROMPT, dados)
@@ -56,7 +65,13 @@ class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             relatorio = gerar_relatorio()
-            enviar_pdf(relatorio, data=date.today().isoformat())
+            if relatorio is None:
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"WEEKEND_SKIP")
+                return
+            data_iso = datetime.now(tz=BRT).strftime("%Y-%m-%d")
+            enviar_pdf(relatorio, data=data_iso)
             self.send_response(200)
             self.end_headers()
             self.wfile.write(b"OK")
